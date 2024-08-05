@@ -1,8 +1,7 @@
 name: Test new Implementation
 on:
   push:
-    branches: [ main ]
-#    branches: [ dev ]
+    branches: [ dev ]
 
 jobs:
   build-and-test:
