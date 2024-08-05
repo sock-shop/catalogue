@@ -193,7 +193,7 @@ services:
             - MONGO_HOST=user-db:27017
 
     front-end:
-        image: front-end # ${FRONT_END_IMAGE}
+        image: ${FRONT_END_IMAGE}
         hostname: front-end
         restart: always
         cap_drop:
