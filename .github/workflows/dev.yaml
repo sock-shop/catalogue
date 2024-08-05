@@ -25,9 +25,9 @@ jobs:
           docker run -d \
             --hostname catalogue-db \
             --name catalogue-db \
-            -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
-            -e MYSQL_ALLOW_EMPTY_PASSWORD=$MYSQL_ALLOW_EMPTY_PASSWORD \
-            -e MYSQL_DATABASE=$MYSQL_DATABASE \
+            -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
+            -e MYSQL_ALLOW_EMPTY_PASSWORD=${MYSQL_ALLOW_EMPTY_PASSWORD} \
+            -e MYSQL_DATABASE=${MYSQL_DATABASE} \
             -v $PWD/docker/catalogue-db/data/dump.sql:/docker-entrypoint-initdb.d/dump.sql \
             mysql:5.7
 
@@ -48,7 +48,7 @@ jobs:
         run: docker build -t catalogue:latest .
 
       - name: Run catalogue container image
-        run: docker run -d -p 80:80 --name catalogue catalogue:latest
+        run: docker run -d --name catalogue catalogue:latest
 
       - name: Check whether the service is alive
         run: docker exec catalogue wget -q -s http://localhost:80/health
