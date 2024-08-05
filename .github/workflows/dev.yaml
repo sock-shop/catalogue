@@ -1,0 +1,69 @@
+name: Test new Implementation
+on:
+  push:
+    branches: [ main ]
+#    branches: [ dev ]
+
+jobs:
+  build-and-test:
+    name: Build and Test Front-End Image
+    runs-on: ubuntu-latest
+    env:
+      MYSQL_ROOT_PASSWORD: fake_password
+      MYSQL_DATABASE: socksdb
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Run Catalogue Db Image
+        run: |
+          docker run -d \
+            --hostname catalogue-db \
+            --name catalogue-db \
+            -e MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD \
+            -e MYSQL_ALLOW_EMPTY_PASSWORD=$MYSQL_ALLOW_EMPTY_PASSWORD \
+            -e MYSQL_DATABASE=$MYSQL_DATABASE \
+            -v $PWD/docker/catalogue-db/data/dump.sql:/docker-entrypoint-initdb.d/dump.sql \
+            mysql:5.7
+
+      - name: Wait for Catalogue DB to be Healthy
+        run: |
+          for i in {1..30}; do
+            if docker exec catalogue-db mysqladmin ping -h localhost --silent; then
+              echo "Database is up!"
+              exit 0
+            fi
+            echo "Waiting for database..."
+            sleep 5
+          done
+          echo "Database failed to start"
+          exit 1
+
+      - name: Build Catalogue Image
+        run: docker build -t catalogue:latest .
+
+      - name: Run catalogue container image
+        run: docker run -d -p 80:80 --name catalogue catalogue:latest
+
+      - name: Check whether the service is alive
+        run: docker exec catalogue curl http://localhost:80/health
+
+      - name: Use the service endpoints
+        run: docker exec catalogue curl http://localhost:80/catalogue
+
+      - name: Get Logs from Catalogue Container
+        run: docker logs catalogue > logs.txt || true
+
+      - name: Check for errors in logs
+        run: |
+          if grep -i "error" logs.txt; then
+            echo "Errors found in container logs"
+            exit 1
+          else
+            echo "No errors found in container logs"
+          fi
