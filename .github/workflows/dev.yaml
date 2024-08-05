@@ -8,10 +8,6 @@ jobs:
   build-and-test:
     name: Build and Test Front-End Image
     runs-on: ubuntu-latest
-    env:
-      MYSQL_ROOT_PASSWORD: fake_password
-      MYSQL_DATABASE: socksdb
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
     defaults:
       run:
         shell: bash
@@ -26,24 +22,6 @@ jobs:
         with:
           compose-file: "./docker-compose-dev.yaml"
         continue-on-error: false
-
-      - name: Wait for catalogue service to be healthy
-        run: |
-          echo "Waiting for catalogue service to be healthy..."
-          for i in {1..30}; do
-            if docker exec catalogue-catalogue-1 wget -q -O- http://localhost:80/health; then
-              echo "Catalogue service is healthy."
-              break
-            else
-              echo "Catalogue service not healthy yet. Waiting..."
-              sleep 10
-            fi
-          done
-          if [ "$i" -eq 30 ]; then
-            echo "Catalogue service did not become healthy in time."
-            docker logs catalogue-catalogue-1
-            exit 1
-          fi
 
       - name: Use the service endpoints
         run: docker exec catalogue-catalogue-1 wget -q -s http://localhost:80/catalogue
