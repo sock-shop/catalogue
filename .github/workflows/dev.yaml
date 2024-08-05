@@ -24,10 +24,10 @@ jobs:
         continue-on-error: false
 
       - name: Use the service endpoints
-        run: docker exec catalogue-catalogue-1 wget -q -s http://localhost:80/catalogue
+        run: docker-compose exec catalogue wget -q -s http://localhost:80/catalogue
 
       - name: Get Logs from Catalogue Container
-        run: docker logs catalogue-catalogue-1 > logs.txt || true
+        run: docker-compose logs catalogue  > logs.txt || true
 
       - name: Check for errors in logs
         run: |
