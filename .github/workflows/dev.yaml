@@ -51,10 +51,10 @@ jobs:
         run: docker run -d -p 80:80 --name catalogue catalogue:latest
 
       - name: Check whether the service is alive
-        run: docker exec catalogue curl http://localhost:80/health
+        run: docker exec catalogue wget -q -s http://localhost:80/health
 
       - name: Use the service endpoints
-        run: docker exec catalogue curl http://localhost:80/catalogue
+        run: docker exec catalogue wget -q -s http://localhost:80/catalogue
 
       - name: Get Logs from Catalogue Container
         run: docker logs catalogue > logs.txt || true
