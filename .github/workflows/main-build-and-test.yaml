@@ -15,6 +15,7 @@ jobs:
       MYSQL_ROOT_PASSWORD: fake_password
       MYSQL_DATABASE: socksdb
       MYSQL_ALLOW_EMPTY_PASSWORD: true
+      AWS_REGION: eu-west-3
     defaults:
       run:
         shell: bash
