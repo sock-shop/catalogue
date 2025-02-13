@@ -41,4 +41,4 @@ LABEL org.label-schema.vendor="Weaveworks" \
   org.label-schema.schema-version="1.0"
 
 CMD ["/app", "-port=80"]
-EXPOSE 80
+# EXPOSE 80
